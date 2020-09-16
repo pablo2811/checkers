@@ -1,7 +1,5 @@
 import copy
-
 import Piece
-
 
 class Pawn(Piece):
     def __init__(self, x, y, col):
@@ -29,3 +27,18 @@ class Pawn(Piece):
         lc = []
         util(board,self.x,self.y,None,None,[])
         return lc
+
+    def move(self,board):
+        in_board = lambda x: 7 >= x >= 0
+        res = []
+        temp = self.longest_chain(board)
+        if not len(temp):
+            for l in [1,-1]:
+                if in_board(self.x+self.col) and in_board(self.y+l) and not board[self.x+self.col][self.y+l]:
+                    res.append((self.x+self.col,self.y+l))
+        else:
+            res = temp
+        return res
+
+
+

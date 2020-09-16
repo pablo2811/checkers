@@ -8,5 +8,9 @@ class Piece:
         self.col = col
 
     @abstractmethod
-    def longest_chain(self,board):
+    def move(self, board):
+        ...
+
+    @abstractmethod
+    def longest_chain(self, board):
         ...
