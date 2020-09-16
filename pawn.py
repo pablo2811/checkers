@@ -4,7 +4,8 @@ import Piece
 class Pawn(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)
-
+        self.canBeat = 0
+        self.moves = None
     def longest_chain(self, board):
 
         def util(current, x, y, badx, bady, chain):
@@ -26,6 +27,7 @@ class Pawn(Piece):
         in_board = lambda x: 7 >= x >= 0
         lc = []
         util(board,self.x,self.y,None,None,[])
+
         return lc
 
     def move(self,board):
@@ -33,12 +35,14 @@ class Pawn(Piece):
         res = []
         temp = self.longest_chain(board)
         if not len(temp):
+            self.canBeat = 0
             for l in [1,-1]:
                 if in_board(self.x+self.col) and in_board(self.y+l) and not board[self.x+self.col][self.y+l]:
                     res.append((self.x+self.col,self.y+l))
         else:
+            self.canBeat = len(temp)
             res = temp
-        return res
+        self.moves = res
 
 
 

@@ -6,6 +6,8 @@ import Piece
 class Queen(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)
+        self.canBeat = 0
+        self.moves = None
 
     def longest_chain(self, board):
 
@@ -42,8 +44,10 @@ class Queen(Piece):
     def move(self, board):
         temp = self.longest_chain(board)
         if len(temp):
+            self.canBeat = len(temp)
             res = temp
         else:
+            self.canBeat = 0
             res = []
             in_board = lambda x: 7 >= x >= 0
             for i in [1, -1]:
@@ -53,4 +57,4 @@ class Queen(Piece):
                     board[self.x + steps * i][self.y + steps * j]:
                         res.append((self.x + steps * i, self.y + steps * j))
                         steps += 1
-        return res
+        self.moves = res
