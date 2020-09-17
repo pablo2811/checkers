@@ -7,7 +7,6 @@ class Queen(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)
         self.canBeat = 0
-        self.moves = None
 
     def longest_chain(self, board):
 
@@ -57,4 +56,4 @@ class Queen(Piece):
                     board[self.x + steps * i][self.y + steps * j]:
                         res.append((self.x + steps * i, self.y + steps * j))
                         steps += 1
-        self.moves = res
+        super(Queen, self).moves = res

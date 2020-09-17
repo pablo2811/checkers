@@ -7,6 +7,7 @@ class Piece:
         self.y = y
         self.col = col
         self.canBeat = 0
+        self.moves = None
 
     @abstractmethod
     def move(self, board):

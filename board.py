@@ -26,3 +26,9 @@ class Board:
         self.board = [[0 for _ in range(8)] for __ in range(8)]
         for piece in self.pieces:
             self.board[piece.x][piece.y] = piece.col
+
+    def get_fig(self, x, y):
+        for fig in self.pieces:
+            if fig.x == x and fig.y == y:
+                return fig
+        return None

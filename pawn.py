@@ -1,11 +1,11 @@
 import copy
-import Piece
+from Piece import Piece
 
 class Pawn(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)
         self.canBeat = 0
-        self.moves = None
+
     def longest_chain(self, board):
 
         def util(current, x, y, badx, bady, chain):
@@ -42,7 +42,8 @@ class Pawn(Piece):
         else:
             self.canBeat = len(temp)
             res = temp
-        self.moves = res
+        super(Pawn, self).moves = res
+
 
 
 
