@@ -5,6 +5,7 @@ class Pawn(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)
         self.canBeat = 0
+        self.moves = None
 
     def longest_chain(self, board):
 
@@ -20,10 +21,13 @@ class Pawn(Piece):
                         n[x][y] = 0
                         n[x + 2 * i][y + 2 * j] = self.col
                         util(n, x + 2 * i, y + 2 * j, x, y, chain)
-            nonlocal lc
-            if len(chain) > len(lc):
+            nonlocal lc,longest_len
+            if len(chain) > longest_len:
                 lc = chain
+            elif len(chain) == longest_len:
+                lc.append(chain)
 
+        longest_len = 0
         in_board = lambda x: 7 >= x >= 0
         lc = []
         util(board,self.x,self.y,None,None,[])
@@ -42,7 +46,7 @@ class Pawn(Piece):
         else:
             self.canBeat = len(temp)
             res = temp
-        super(Pawn, self).moves = res
+        self.moves = res
 
 
 

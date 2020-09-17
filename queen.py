@@ -7,6 +7,7 @@ class Queen(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)
         self.canBeat = 0
+        self.moves = None
 
     def longest_chain(self, board):
 

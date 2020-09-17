@@ -26,6 +26,7 @@ class GameLogic:
         self.possible_moves()
     
     def showpositions(self,x,y):
+        self.possible_moves()
         if self.board.board[x][y] == self.move:
             return self.board.get_fig(x,y).moves
 

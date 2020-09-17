@@ -1,4 +1,4 @@
-import arcade,Game
+import arcade, Game
 from arcade.gui import *
 
 SW = 1000
@@ -29,14 +29,37 @@ class Gui(arcade.View):
         super().__init__()
         self.game = Game.GameLogic()
         self.board = None
-
+        self.cellsize = SH // 8
+        self.show_possible = False
+        self.dots = None
 
     def on_draw(self):
         arcade.start_render()
         self.board = arcade.load_texture("board.jpg")
-        self.board.draw_sized(SW//2,SH//2,SW,SH)
-    def on_update(self, delta_time: float):
-        
+        black = arcade.load_texture("black.png")
+        white = arcade.load_texture("white.png")
+        self.board.draw_sized(SW // 2, SH // 2, SW, SH)
+        img = [None, black, white]
+        for piece in self.game.board.pieces:
+            img[piece.col].draw_sized(self.cellsize * piece.y + self.cellsize // 2,
+                                      SW - self.cellsize * piece.x - self.cellsize // 2, self.cellsize, self.cellsize)
+        if self.show_possible:
+            dots = arcade.load_texture("dot.png")
+            print(self.dots)
+            for p in self.dots:
+                dots.draw_sized(self.cellsize * p[1] + self.cellsize // 2,
+                                SW - self.cellsize * p[0] - self.cellsize // 2, self.cellsize//2,
+                                self.cellsize//2)
+
+    def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
+        if self.show_possible:
+            self.show_possible = False  # unless decision
+
+        else:
+            self.show_possible = True
+            X = (SH - y) // self.cellsize
+            Y = x // self.cellsize
+            self.dots = self.game.showpositions(X, Y)
 
 
 class Menu(arcade.View):

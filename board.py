@@ -8,20 +8,22 @@ class Board:
             self.pieces = pieces
         else:
             self.pieces = []
-            j = 0
+            k = 0
             for i in range(5, 8):
+                j = k
                 while j < 8:
                     new_piece = Pawn(i, j, -1)
                     self.pieces.append(new_piece)
                     j += 2
-                j = int(not j)
-            j = 0
+                k = int(not k)
+            z = 1
             for k in range(0, 3):
+                j = z
                 while j < 8:
                     new_piece = Pawn(k, j, 1)
                     self.pieces.append(new_piece)
                     j += 2
-                j = int(not j)
+                z = int(not z)
 
         self.board = [[0 for _ in range(8)] for __ in range(8)]
         for piece in self.pieces:
