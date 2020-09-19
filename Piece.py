@@ -15,3 +15,11 @@ class Piece:
     @abstractmethod
     def longest_chain(self, board):
         ...
+
+    def change_pos(self, x, y):
+        self.x = x
+        self.y = y
+
+    def rotate_self(self):
+        self.x = 7 - self.x
+        self.y = 7 - self.y

@@ -1,3 +1,5 @@
+import copy
+
 import arcade, Game
 from arcade.gui import *
 
@@ -45,21 +47,65 @@ class Gui(arcade.View):
                                       SW - self.cellsize * piece.x - self.cellsize // 2, self.cellsize, self.cellsize)
         if self.show_possible:
             dots = arcade.load_texture("dot.png")
-            print(self.dots)
-            for p in self.dots:
-                dots.draw_sized(self.cellsize * p[1] + self.cellsize // 2,
-                                SW - self.cellsize * p[0] - self.cellsize // 2, self.cellsize//2,
-                                self.cellsize//2)
+            for z in self.dots:
+                for p in z:
+                    dots.draw_sized(self.cellsize * p[1] + self.cellsize // 2,
+                                    SW - self.cellsize * p[0] - self.cellsize // 2, self.cellsize // 2,
+                                    self.cellsize // 2)
+
+    def is_in_any_chain(self, X, Y):
+        pos = (X, Y)
+        for chain in self.dots:
+            for c in chain:
+                if c == pos:
+                    return True
+        return False
+
+    def is_first_in_any_chain(self, X, Y):
+        pos = (X, Y)
+        for chain in self.dots:
+            if chain[0] == pos:
+                return True
+        return False
+
+    def modify_chains(self, X, Y):
+        pos = (X, Y)
+        temp = copy.deepcopy(self.dots)
+        us = 0
+        for i in range(len(temp)):
+            if temp[i][0] != pos:
+                self.dots.remove(temp[i])
+                us += 1
+            else:
+                if len(self.dots[i - us]) > 1:
+                    self.dots[i - us] = self.dots[i - us][1:]
+                else:
+                    self.dots.remove(self.dots[i - us])
+        self.game.chosen_pawn.moves = self.dots
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
-        if self.show_possible:
-            self.show_possible = False  # unless decision
+        X = (SH - y) // self.cellsize
+        Y = x // self.cellsize
+        if self.show_possible or self.game.moved_chosen:
+            if self.is_in_any_chain(X, Y) or self.game.moved_chosen:
+                if self.is_first_in_any_chain(X, Y):
+                    self.modify_chains(X, Y)
+                    self.game.chosen_pawn.change_pos(X, Y)
+                    self.game.moved_chosen = True
+                    if self.game.check_end_move():
+                        self.game.switch()
+                        self.show_possible = False
+                        self.dots = None
+
+            else:
+                self.show_possible = False
+                self.dots = None
 
         else:
-            self.show_possible = True
-            X = (SH - y) // self.cellsize
-            Y = x // self.cellsize
             self.dots = self.game.showpositions(X, Y)
+            if self.dots is not None:
+                self.show_possible = True
+                self.game.set_chosen_pawn(X, Y)
 
 
 class Menu(arcade.View):
