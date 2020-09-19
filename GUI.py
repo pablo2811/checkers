@@ -37,6 +37,7 @@ class Gui(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
+      #  print(self.dots)
         self.board = arcade.load_texture("board.jpg")
         black = arcade.load_texture("black.png")
         white = arcade.load_texture("white.png")
@@ -90,7 +91,7 @@ class Gui(arcade.View):
             if self.is_in_any_chain(X, Y) or self.game.moved_chosen:
                 if self.is_first_in_any_chain(X, Y):
                     self.modify_chains(X, Y)
-                    self.game.chosen_pawn.change_pos(X, Y)
+                    self.game.move_chosen_pawn(X, Y)
                     self.game.moved_chosen = True
                     if self.game.check_end_move():
                         self.game.switch()

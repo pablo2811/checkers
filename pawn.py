@@ -2,6 +2,7 @@ import copy
 from Piece import Piece
 
 
+
 class Pawn(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)
@@ -24,7 +25,8 @@ class Pawn(Piece):
                         util(n, x + 2 * i, y + 2 * j, x, y, chain)
             nonlocal lc, longest_len
             if len(chain) > longest_len:
-                lc = chain
+                lc = []
+                lc.append(chain)
             elif len(chain) == longest_len and len(chain) > 0:
                 lc.append(chain)
 
