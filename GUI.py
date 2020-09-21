@@ -37,10 +37,12 @@ class Gui(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-      #  print(self.dots)
+        if self.game.winner is not None:
+            pass
+            # add restart end-game view
         self.board = arcade.load_texture("board.jpg")
-        black = arcade.load_texture("black.png")
-        white = arcade.load_texture("white.png")
+        black = arcade.load_texture("red.png")
+        white = arcade.load_texture("black.png")
         self.board.draw_sized(SW // 2, SH // 2, SW, SH)
         img = [None, black, white]
         for piece in self.game.board.pieces:

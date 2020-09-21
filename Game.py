@@ -2,6 +2,7 @@ import copy
 import math
 
 from board import Board
+from Queen import Queen
 
 
 class GameLogic:
@@ -27,6 +28,12 @@ class GameLogic:
             for fig in self.board.pieces:
                 if fig.canBeat < m and fig.col == self.move:
                     fig.moves = None
+
+    def check_queen_upgrade(self):
+        if (self.move == 1 and self.chosen_pawn.x == 7) or (not self.chosen_pawn.x and self.move == -1):
+            Q = Queen(self.chosen_pawn.x, self.chosen_pawn.y, self.move)
+            self.board.pieces.append(Q)
+            self.board.pieces.remove(self.chosen_pawn)
 
     def switch(self):
         self.move *= -1
@@ -64,7 +71,7 @@ class GameLogic:
                     self.chosen_pawn.moves[i - us] = self.chosen_pawn.moves[i - us][1:]
                 else:
                     self.chosen_pawn.moves.remove(self.chosen_pawn.moves[i - us])
-        return  self.chosen_pawn.moves
+        return self.chosen_pawn.moves
 
     def showpositions(self, x, y):
         if self.board.board[x][y] == self.move:
