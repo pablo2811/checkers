@@ -17,16 +17,17 @@ class Pawn(Piece):
                     if in_board(x + 2 * i) and in_board(y + 2 * j) and current[x + i][y + j] == -self.col and not \
                             current[x + 2 * i][y + 2 * j]:
                         if x + 2 * i != badx or y + 2 * j != bady:
-                            chain.append((x + 2 * i, y + 2 * j))
-                        n = copy.deepcopy(current)
-                        n[x + i][y + j] = 0
-                        n[x][y] = 0
-                        n[x + 2 * i][y + 2 * j] = self.col
-                        util(n, x + 2 * i, y + 2 * j, x, y, chain)
+                            next_chain = copy.deepcopy(chain)
+                            next_chain.append((x + 2 * i, y + 2 * j))
+                            n = copy.deepcopy(current)
+                            n[x + i][y + j] = 0
+                            n[x][y] = 0
+                            n[x + 2 * i][y + 2 * j] = self.col
+                            util(n, x + 2 * i, y + 2 * j, x, y, next_chain)
             nonlocal lc, longest_len
             if len(chain) > longest_len:
-                lc = []
-                lc.append(chain)
+                longest_len = len(chain)
+                lc = [chain]
             elif len(chain) == longest_len and len(chain) > 0:
                 lc.append(chain)
 
@@ -47,6 +48,6 @@ class Pawn(Piece):
                 if in_board(self.x + self.col) and in_board(self.y + l) and not board[self.x + self.col][self.y + l]:
                     res.append([(self.x + self.col, self.y + l)])
         else:
-            self.canBeat = len(temp)
+            self.canBeat = len(temp[0])
             res = temp
         self.moves = res
