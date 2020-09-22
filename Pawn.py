@@ -49,4 +49,6 @@ class Pawn(Piece):
         else:
             self.canBeat = len(temp[0])
             res = temp
+        if not len(res):
+            res = None
         self.moves = res

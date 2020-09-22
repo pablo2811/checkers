@@ -25,6 +25,8 @@ class GameLogic:
             if fig.col == self.move:
                 fig.move(self.board.board)
                 m = max(m, fig.canBeat)
+        if self.is_end():
+            self.winner = self.move * (-1)
         if m > 0:
             for fig in self.board.pieces:
                 if fig.canBeat < m and fig.col == self.move:
@@ -41,8 +43,6 @@ class GameLogic:
         self.chosen_pawn = None
         self.moved_chosen = False
         self.possible_moves()
-        if self.is_end():
-            self.winner = self.move * (-1)
 
     def is_in_any_chain(self, X, Y):
         pos = (X, Y)
@@ -83,7 +83,6 @@ class GameLogic:
         if self.board.board[x][y] == self.move:
             self.chosen_pawn = self.board.get_fig(x, y)
 
-    # To fix !
     def move_chosen_pawn(self, x, y):
         if type(self.chosen_pawn) is Pawn and math.fabs(self.chosen_pawn.x - x) > 1:
             to_kill = self.board.get_fig(int((1 / 2) * (x + self.chosen_pawn.x)),
@@ -112,6 +111,7 @@ class GameLogic:
 
     def is_end(self):
         for fig in self.board.pieces:
-            if fig.moves is not None:
-                return False
+            if fig.col == self.move:
+                if fig.moves is not None:
+                    return False
         return True
