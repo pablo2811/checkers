@@ -1,8 +1,6 @@
-import copy
-
 import arcade, Game
 from arcade.gui import *
-
+import Queen,Pawn
 SW = 1000
 SH = 1000
 TITLE = "Checkers"
@@ -26,6 +24,15 @@ class QuitButton(UIFlatButton):
         arcade.finish_render()
 
 
+class SettingsButton(UIFlatButton):
+    def __init__(self, text, cx, cy, w, h):
+        super().__init__(text, cx, cy, w, h)
+        self.pressed = False
+
+    def on_press(self):
+        self.pressed = not self.pressed
+
+
 class Gui(arcade.View):
     def __init__(self):
         super().__init__()
@@ -41,12 +48,18 @@ class Gui(arcade.View):
             pass
             # add restart end-game view
         self.board = arcade.load_texture("board.jpg")
-        black = arcade.load_texture("red.png")
-        white = arcade.load_texture("black.png")
+        blackPawn = arcade.load_texture("black.png")
+        blackQueen = arcade.load_texture("blackQueen.png")
+        redQueen = arcade.load_texture("redQueen.png")
+        redPawn = arcade.load_texture("red.png")
         self.board.draw_sized(SW // 2, SH // 2, SW, SH)
-        img = [None, black, white]
+        img = [None, [blackPawn,blackQueen], [redPawn,redQueen]]
         for piece in self.game.board.pieces:
-            img[piece.col].draw_sized(self.cellsize * piece.y + self.cellsize // 2,
+            if type(piece) is Queen.Queen:
+                i = 1
+            else:
+                i = 0
+            img[piece.col][i].draw_sized(self.cellsize * piece.y + self.cellsize // 2,
                                       SW - self.cellsize * piece.x - self.cellsize // 2, self.cellsize, self.cellsize)
         if self.show_possible:
             dots = arcade.load_texture("dot.png")
@@ -55,7 +68,6 @@ class Gui(arcade.View):
                     dots.draw_sized(self.cellsize * p[1] + self.cellsize // 2,
                                     SW - self.cellsize * p[0] - self.cellsize // 2, self.cellsize // 2,
                                     self.cellsize // 2)
-
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
         X = (SH - y) // self.cellsize
@@ -91,6 +103,10 @@ class Menu(arcade.View):
     def setup(self):
         new_game = NewGameButton("New game", SW // 2, 2 * SH // 3, SW // 3, SH // 7, self)
         self.button_list.append(new_game)
+        pvp = SettingsButton("PVP",5*SW // 12, 11*SH // 21, SW // 6, SH // 7)
+        computer = SettingsButton("Computer",7*SW //12,11 * SH // 21, SW // 6, SH // 7)
+        self.button_list.append(pvp)
+        self.button_list.append(computer)
         about = UIFlatButton("About", SW // 2, 8 * SH // 21, SW // 3, SH // 7)
         self.button_list.append(about)  # later on
         quitbutt = QuitButton("Quit", SW // 2, 5 * SH // 21, SW // 3, SH // 7)

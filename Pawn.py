@@ -2,7 +2,6 @@ import copy
 from Piece import Piece
 
 
-
 class Pawn(Piece):
     def __init__(self, x, y, col):
         super().__init__(x, y, col)

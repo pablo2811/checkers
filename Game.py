@@ -3,6 +3,7 @@ import math
 
 from board import Board
 from Queen import Queen
+from Pawn import Pawn
 
 
 class GameLogic:
@@ -81,18 +82,30 @@ class GameLogic:
     def set_chosen_pawn(self, x, y):
         if self.board.board[x][y] == self.move:
             self.chosen_pawn = self.board.get_fig(x, y)
-        print(self.chosen_pawn.moves)
 
+    # To fix !
     def move_chosen_pawn(self, x, y):
-        if math.fabs(self.chosen_pawn.x - x) > 1:
+        if type(self.chosen_pawn) is Pawn and math.fabs(self.chosen_pawn.x - x) > 1:
             to_kill = self.board.get_fig(int((1 / 2) * (x + self.chosen_pawn.x)),
                                          int((1 / 2) * (y + self.chosen_pawn.y)))
             self.board.pieces.remove(to_kill)
+        elif type(self.chosen_pawn) is Queen and math.fabs(self.chosen_pawn.x - x) > 1 :
+            i = int(math.copysign(1,self.chosen_pawn.x - x))
+            j = int(math.copysign(1,self.chosen_pawn.y - y))
+            l = 1
+            while x + i*l != self.chosen_pawn.x and y + j*l != self.chosen_pawn.y:
+                if self.board.board[x + i*l][y + j*l] == -self.chosen_pawn.col:
+                    to_kill = self.board.get_fig(x+i*l,y+j*l)
+                    self.board.pieces.remove(to_kill)
+                    break
+                else:
+                    l += 1
         self.chosen_pawn.change_pos(x, y)
         self.board.update_board_matrix()
 
     def check_end_move(self):
         if self.moved_chosen and not len(self.chosen_pawn.moves):
+            self.check_queen_upgrade()
             return True
         else:
             return False
