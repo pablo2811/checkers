@@ -13,7 +13,7 @@ class NewGameButton(UIFlatButton):
         self.view = view
 
     def on_press(self):
-        gui = Gui()
+        gui = Gui(self.view.mode)
         self.view.window.show_view(gui)
 
 
@@ -26,12 +26,17 @@ class QuitButton(UIFlatButton):
 
 
 class SettingsButton(UIFlatButton):
-    def __init__(self, text, cx, cy, w, h):
+    def __init__(self, text, cx, cy, w, h, pressed, cob=None):
         super().__init__(text, cx, cy, w, h)
-        self.pressed = False
+        self.pressed = pressed
+        self.cob = cob
 
     def on_press(self):
         self.pressed = not self.pressed
+        self.cob.pressed = not self.cob.pressed
+
+    def set_cob(self, cob):
+        self.cob = cob
 
 
 class MainMenuButton(UIFlatButton):
@@ -72,22 +77,20 @@ class After(arcade.View):
                     button.on_press()
 
 
-
-
 class Gui(arcade.View):
-    def __init__(self):
+    def __init__(self, mode):
         super().__init__()
         self.game = Game.GameLogic()
         self.board = None
         self.cellsize = SH // 8
         self.show_possible = False
         self.dots = None
+        self.mode = mode
 
     def on_draw(self):
         arcade.start_render()
         if self.game.winner is not None:
             self.window.show_view(After())
-            # add restart end-game view
         self.board = arcade.load_texture("board.jpg")
         blackPawn = arcade.load_texture("black.png")
         blackQueen = arcade.load_texture("blackQueen.png")
@@ -141,18 +144,29 @@ class Menu(arcade.View):
         super().__init__()
         self.button_list = []
         self.setup()
+        self.mode = "PVP"
 
     def setup(self):
         new_game = NewGameButton("New game", SW // 2, 2 * SH // 3, SW // 3, SH // 7, self)
         self.button_list.append(new_game)
-        pvp = SettingsButton("PVP", 5 * SW // 12, 11 * SH // 21, SW // 6, SH // 7)
-        computer = SettingsButton("Computer", 7 * SW // 12, 11 * SH // 21, SW // 6, SH // 7)
+        pvp = SettingsButton("PVP", 5 * SW // 12, 11 * SH // 21, SW // 6, SH // 7, pressed=True)
+        computer = SettingsButton("Computer", 7 * SW // 12, 11 * SH // 21, SW // 6, SH // 7, pressed=False, cob=pvp)
+        pvp.set_cob(computer)
         self.button_list.append(pvp)
         self.button_list.append(computer)
         about = UIFlatButton("About", SW // 2, 8 * SH // 21, SW // 3, SH // 7)
         self.button_list.append(about)  # later on
         quitbutt = QuitButton("Quit", SW // 2, 5 * SH // 21, SW // 3, SH // 7)
         self.button_list.append(quitbutt)
+
+    def checkSettings(self):
+        for b in self.button_list:
+            if b.pressed and b.text == "PVP":
+                self.mode = "PVP"
+                break
+            elif b.pressed and b.text == "Computer":
+                self.mode = "Computer"
+                break
 
     def on_draw(self):
         arcade.start_render()
