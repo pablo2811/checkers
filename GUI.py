@@ -13,6 +13,7 @@ class NewGameButton(UIFlatButton):
         self.view = view
 
     def on_press(self):
+        self.view.checkSettings()
         gui = Gui(self.view.mode)
         self.view.window.show_view(gui)
 
@@ -86,11 +87,19 @@ class Gui(arcade.View):
         self.show_possible = False
         self.dots = None
         self.mode = mode
+        self.ai = None
 
     def on_draw(self):
         arcade.start_render()
         if self.game.winner is not None:
             self.window.show_view(After())
+        if self.mode == "Computer" and self.game.move == 1:
+            self.game.moveAI()
+            self.dots = [self.game.chain_ai]
+            if self.game.move == 1:
+                self.show_possible = True
+            else:
+                self.show_possible = False
         self.board = arcade.load_texture("board.jpg")
         blackPawn = arcade.load_texture("black.png")
         blackQueen = arcade.load_texture("blackQueen.png")
