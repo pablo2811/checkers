@@ -12,6 +12,7 @@ class Queen(Piece):
     def longest_chain(self, board):
         all_chains = []
         in_board = lambda x: 7 >= x >= 0
+
         def util(current, x, y, badxdir, badydir, chain):
             for i in [1, -1]:
                 for j in [1, -1]:
@@ -33,13 +34,14 @@ class Queen(Piece):
                                 util(new_board, x + l * i, y + l * j, -i, -j, new_chain)
                                 l += 1
             all_chains.append(chain)
-        util(board,self.x,self.y,None,None,[])
+
+        util(board, self.x, self.y, None, None, [])
         m = 0
         for chain in all_chains:
             m = max(m, len(chain))
         temp = copy.deepcopy(all_chains)
         for t in temp:
-            if len(t) < m:
+            if len(t) < m or m == 0:
                 all_chains.remove(t)
         return all_chains
 
@@ -60,4 +62,3 @@ class Queen(Piece):
                         res.append([(self.x + leng * i, self.y + leng * j)])
                         leng += 1
         self.moves = res
-

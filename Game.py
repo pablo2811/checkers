@@ -8,7 +8,7 @@ import AI
 
 
 class GameLogic:
-    def __init__(self, save=False,move=-1):
+    def __init__(self, save=False, move=-1):
         if save:
             pass
             # add saving
@@ -109,18 +109,20 @@ class GameLogic:
 
     def moveAI(self):
         if self.chosen_pawn is None:
-            self.AI = AI.CheckersAI(self, 3)
+            self.AI = AI.CheckersAI(self, 4)
             figx, self.chain_ai = self.AI.fig_move()
-            self.set_chosen_pawn(figx.x,figx.y)
+            if figx is None:
+                self.winner = -1
+            else:
+                self.set_chosen_pawn(figx.x, figx.y)
         else:
             self.move_chosen_pawn(self.chain_ai[0][0], self.chain_ai[0][1])
             self.moved_chosen = True
             self.chain_ai.remove(self.chain_ai[0])
-            time.sleep(1)
-        if self.chain_ai is not None and not len(self.chain_ai):
+            time.sleep(0.1)
+        if (self.chain_ai is not None and not len(self.chain_ai)) or self.winner:
+            self.check_end_move()
             self.switch()
-
-
 
     def check_end_move(self):
         if self.moved_chosen and not len(self.chosen_pawn.moves):

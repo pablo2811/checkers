@@ -28,19 +28,45 @@ class Board:
         self.board = [[0 for _ in range(8)] for __ in range(8)]
         self.update_board_matrix()
         self.value = None
+        self.tie = None
 
-    def set_value(self, n=3):
+    def set_value(self, n=10):
+        #self.set_tie()
+        self.tie = -len(self.pieces)
         v = 0
         for fig in self.pieces:
-            if type(fig) is Pawn:
-                inc = 1
-            else:
-                inc = n
             if fig.col == 1:
-                v += n
+                if type(fig) is Pawn:
+                    v += fig.y
+                else:
+                    v += n
             else:
-                v -= n
+                if type(fig) is Pawn:
+                    v -= 7 - fig.y
+                else:
+                    v -= n
+
         self.value = v
+
+    def set_tie(self):
+        v = 0
+        for fig in self.pieces:
+            if fig.col == 1:
+                if type(fig) is Pawn:
+                    v += 3
+                else:
+                    v += 5
+            else:
+                if type(fig) is Pawn:
+                    v -= 3
+                else:
+                    v -= 5
+
+        self.tie = v
+
+
+
+
 
     def get_fig(self, x, y):
         for fig in self.pieces:
