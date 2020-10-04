@@ -1,6 +1,9 @@
+import copy
+
 import arcade, Game
 from arcade.gui import *
 import Queen
+import sys
 
 SW = 1000
 SH = 1000
@@ -14,7 +17,7 @@ class NewGameButton(UIFlatButton):
 
     def on_press(self):
         self.view.checkSettings()
-        gui = Gui(self.view.mode)
+        gui = Gui(self.view.mode,self.view.level)
         self.view.window.show_view(gui)
 
 
@@ -27,17 +30,18 @@ class QuitButton(UIFlatButton):
 
 
 class SettingsButton(UIFlatButton):
-    def __init__(self, text, cx, cy, w, h, pressed, cob=None):
+    def __init__(self, text, cx, cy, w, h, pressed, ):
         super().__init__(text, cx, cy, w, h)
         self.pressed = pressed
-        self.cob = cob
+        self.cob = []
 
     def on_press(self):
-        self.pressed = not self.pressed
-        self.cob.pressed = not self.cob.pressed
+        self.pressed = True
+        for c in self.cob:
+            c.pressed = False
 
     def set_cob(self, cob):
-        self.cob = cob
+        self.cob.append(cob)
 
 
 class MainMenuButton(UIFlatButton):
@@ -79,7 +83,7 @@ class After(arcade.View):
 
 
 class Gui(arcade.View):
-    def __init__(self, mode):
+    def __init__(self, mode, lvl):
         super().__init__()
         self.game = Game.GameLogic()
         self.board = None
@@ -88,13 +92,18 @@ class Gui(arcade.View):
         self.dots = None
         self.mode = mode
         self.ai = None
-
+        if lvl == "easy":
+            self.depth = 3
+        elif lvl == "medium":
+            self.depth = 4
+        elif lvl == "hard":
+            self.depth = 6
     def on_draw(self):
         arcade.start_render()
         if self.game.winner is not None:
             self.window.show_view(After())
         if self.mode == "Computer" and self.game.move == 1:
-            self.game.moveAI()
+            self.game.moveAI(self.depth)
             self.dots = [self.game.chain_ai]
             if self.game.move == 1:
                 self.show_possible = True
@@ -154,13 +163,16 @@ class Menu(arcade.View):
         self.button_list = []
         self.setup()
         self.mode = "PVP"
+        self.added = False
+        self.level = ""
 
     def setup(self):
         new_game = NewGameButton("New game", SW // 2, 2 * SH // 3, SW // 3, SH // 7, self)
         self.button_list.append(new_game)
         pvp = SettingsButton("PVP", 5 * SW // 12, 11 * SH // 21, SW // 6, SH // 7, pressed=True)
-        computer = SettingsButton("Computer", 7 * SW // 12, 11 * SH // 21, SW // 6, SH // 7, pressed=False, cob=pvp)
+        computer = SettingsButton("Computer", 7 * SW // 12, 11 * SH // 21, SW // 6, SH // 7, pressed=False)
         pvp.set_cob(computer)
+        computer.set_cob(pvp)
         self.button_list.append(pvp)
         self.button_list.append(computer)
         about = UIFlatButton("About", SW // 2, 8 * SH // 21, SW // 3, SH // 7)
@@ -175,11 +187,38 @@ class Menu(arcade.View):
                 break
             elif b.pressed and b.text == "Computer":
                 self.mode = "Computer"
+                for bx in self.button_list:
+                    if bx.width ==  SW//10 and bx.pressed:
+                        self.level = bx.text
                 break
+
+    def add_level(self):
+        easy = SettingsButton("easy", 4 * SW // 10, 4 * SH // 5, SW // 10, SH // 14, pressed=False)
+        medium = SettingsButton("medium", 5 * SW // 10, 4 * SH // 5, SW // 10, SH // 14, pressed=True)
+        hard = SettingsButton("hard", 6 * SW // 10, 4 * SH // 5, SW // 10, SH // 14, pressed=False)
+        l = [easy, medium, hard]
+        for b in l:
+            self.button_list.append(b)
+            for z in l:
+                if z != b:
+                    b.set_cob(z)
+        self.added = True
+
+    def remove_level(self):
+        z = ["easy", "medium", "hard"]
+        iterate = copy.copy(self.button_list)
+        for b in iterate:
+            if b.text in z:
+                self.button_list.remove(b)
 
     def on_draw(self):
         arcade.start_render()
         for button in self.button_list:
+            if self.added and button.text == "PVP" and button.pressed:
+                self.added = False
+                self.remove_level()
+            if button.text == "Computer" and button.pressed and not self.added:
+                self.add_level()
             button.draw()
 
     def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
@@ -190,6 +229,7 @@ class Menu(arcade.View):
 
 
 def main():
+    sys.setrecursionlimit(100000)
     window = arcade.Window(SW, SH, TITLE)
     window.show_view(Menu())
     arcade.run()

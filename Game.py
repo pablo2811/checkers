@@ -36,7 +36,7 @@ class GameLogic:
                     fig.moves = None
 
     def check_queen_upgrade(self):
-        if (self.move == 1 and self.chosen_pawn.x == 7) or (not self.chosen_pawn.x and self.move == -1):
+        if (self.move == 1 and self.chosen_pawn.x == 7) or (not self.chosen_pawn.x and self.move == -1) and self.chosen_pawn is not None:
             Q = Queen(self.chosen_pawn.x, self.chosen_pawn.y, self.move)
             self.board.pieces.append(Q)
             self.board.pieces.remove(self.chosen_pawn)
@@ -107,9 +107,9 @@ class GameLogic:
         self.chosen_pawn.change_pos(x, y)
         self.board.update_board_matrix()
 
-    def moveAI(self):
+    def moveAI(self,n):
         if self.chosen_pawn is None:
-            self.AI = AI.CheckersAI(self, 4)
+            self.AI = AI.CheckersAI(self,n)
             figx, self.chain_ai = self.AI.fig_move()
             if figx is None:
                 self.winner = -1
@@ -119,8 +119,9 @@ class GameLogic:
             self.move_chosen_pawn(self.chain_ai[0][0], self.chain_ai[0][1])
             self.moved_chosen = True
             self.chain_ai.remove(self.chain_ai[0])
-            time.sleep(0.1)
+            time.sleep(0.05)
         if (self.chain_ai is not None and not len(self.chain_ai)) or self.winner:
+            self.check_queen_upgrade()
             self.check_end_move()
             self.switch()
 

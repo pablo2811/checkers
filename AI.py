@@ -6,47 +6,45 @@ class CheckersAI:
         self.root_board = State(copy.deepcopy(game), None, 0, None, None)
         self.max_depth = maxDepth
 
-    def minimax(self, current):
+    def minimax(self, current, alpha, beta):
         if current.depth == self.max_depth:
             current.best_route = current
-            return current.game.board.value, current.game.board.tie
+            return current.game.board.value
         current.create_children()
         if not len(current.childrenStates):
-            return current.game.board.value, current.game.board.tie
+            return current.game.board.value
         else:
             if current.type == 1:
                 M = -100000
-                T = -100000
                 best = None
+                current.childrenStates.sort(key=lambda x: x.game.board.value, reverse=True)
                 for c in current.childrenStates:
-                    main, tie = self.minimax(c)
+                    main = self.minimax(c, alpha, beta)
                     if main > M:
                         best = c
                         M = main
-                        T = tie
-                    elif main == M and tie > T:
-                        best = c
-                        T = tie
+                    alpha = max(alpha, main)
+                    if beta <= alpha:
+                        break
                 current.best_route = best
-                return M, T
+                return M
             else:
                 M = 100000
-                T = 100000
                 best = None
+                current.childrenStates.sort(key=lambda x: x.game.board.value, reverse=False)
                 for c in current.childrenStates:
-                    main, tie = self.minimax(c)
+                    main = self.minimax(c, alpha, beta)
                     if main < M:
                         best = c
                         M = main
-                        T = tie
-                    elif main == M and tie < T:
-                        best = c
-                        T = tie
+                    beta = min(beta, main)
+                    if beta <= alpha:
+                        break
                 current.best_route = best
-                return M, T
+                return M
 
     def fig_move(self):
-        self.minimax(self.root_board)
+        self.minimax(self.root_board, -100000, 100000)
         if self.root_board.best_route is not None:
             return self.root_board.best_route.fig, self.root_board.best_route.chom
         else:
@@ -75,5 +73,6 @@ class State:
                         next_board.set_chosen_pawn(fig.x, fig.y)
                         for x in c:
                             next_board.move_chosen_pawn(x[0], x[1])
+                        next_board.move *= (-1)
                         new_state = State(next_board, self, self.depth + 1, copy.deepcopy(c), copy.deepcopy(fig))
                         self.childrenStates.append(new_state)
